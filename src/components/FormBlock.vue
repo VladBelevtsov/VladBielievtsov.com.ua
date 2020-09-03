@@ -1,8 +1,9 @@
 <template>
-  <div class="form-block" :class="{ open: value }">
+  <div class="form-block">
     <div class="close" @click.prevent="$emit('click')">
       <svg height="329pt" viewBox="0 0 329.26933 329" width="329pt" xmlns="http://www.w3.org/2000/svg"><path d="m194.800781 164.769531 128.210938-128.214843c8.34375-8.339844 8.34375-21.824219 0-30.164063-8.339844-8.339844-21.824219-8.339844-30.164063 0l-128.214844 128.214844-128.210937-128.214844c-8.34375-8.339844-21.824219-8.339844-30.164063 0-8.34375 8.339844-8.34375 21.824219 0 30.164063l128.210938 128.214843-128.210938 128.214844c-8.34375 8.339844-8.34375 21.824219 0 30.164063 4.15625 4.160156 9.621094 6.25 15.082032 6.25 5.460937 0 10.921875-2.089844 15.082031-6.25l128.210937-128.214844 128.214844 128.214844c4.160156 4.160156 9.621094 6.25 15.082032 6.25 5.460937 0 10.921874-2.089844 15.082031-6.25 8.34375-8.339844 8.34375-21.824219 0-30.164063zm0 0"/></svg>
     </div>
+    <div class="overflow"  @click.prevent="$emit('click')"></div>
     <form @submit.prevent="sendEmail">
       <input 
         type="text" 
@@ -10,20 +11,29 @@
         placeholder="Your name"
         v-model="user_name"
       >
-      <span v-if="!$v.user_name.required && $v.user_name.$dirty">Name is required!</span>
+      <span class="text-danger" v-if="!$v.user_name.required && $v.user_name.$dirty">Name is required!</span>
       <input 
-        type="text" 
+        type="email" 
         name="user_email" 
         placeholder="Your email"
         v-model.trim="user_email" 
       >
+      <span class="text-danger" v-if="(!$v.user_email.required || !$v.user_email.email) && $v.user_email.$dirty">Valid Email is required!</span>
       <textarea 
         placeholder="messages" 
         name="message"
         v-model="message"
       ></textarea>
+      <span class="text-danger" v-if="!$v.message.required && $v.message.$dirty">Message is required!</span>
+      <span class="text-danger" v-if="(!$v.message.minLength || !$v.message.maxLength) && $v.message.$dirty">Message must be between {{ $v.message.$params.minLength.min }} and {{ $v.message.$params.maxLength.max }} characters!</span>
       <input class="btn-submit" type="submit" value="Submit">
     </form>
+    <div class="answer" >
+      <div class="success-card">
+        <span>Success!</span> 
+        Thank you for your message. I'll reply to you as soon as possible 💌
+      </div>
+    </div>
   </div>
 </template>
 
@@ -40,9 +50,7 @@ export default {
   }),
   validations: {
     user_name: {
-      required,
-      minLength: minLength(2),
-      maxLength: maxLength(24)
+      required
     },
     user_email: {
       required,
@@ -55,30 +63,28 @@ export default {
     }
   },
   methods: {
-    // sendTo:(e) => {
-
-    //   emailjs.sendForm('gmail', 'template_j31Ot9l6', e.target, 'user_IIctbikCJsk2u3iLfMclI')
-    //     .then((result) => {
-    //         console.log('SUCCESS!', result.status, result.text);
-
-
-    //     }, (error) => {
-    //         console.log('FAILED...', error);
-    //     });
-    // },
+    resetData() {
+      this.user_name = '',
+      this.user_email = '',
+      this.message = ''
+    },
+    sendTo:(e) => {
+      
+      emailjs.sendForm('', '', e.target, '')
+        .then((result) => {
+            console.log('SUCCESS!', result.status, result.text);
+        }, (error) => {
+            console.log('FAILED...', error);
+        });
+    },
     sendEmail (e)  {
       this.$v.$touch();
-
       if (!this.$v.$invalid) {
-
-        emailjs.sendForm('gmail', 'template_j31Ot9l6', e.target, 'user_IIctbikCJsk2u3iLfMclI')
-          .then((result) => {
-              console.log('SUCCESS!', result.status, result.text);
-
-
-          }, (error) => {
-              console.log('FAILED...', error);
-          });
+        this.sendTo(e)
+        this.$v.$reset()
+        this.resetData()
+        document.querySelector('.success-card').style.left = "20px";
+        setTimeout("document.querySelector('.success-card').style.left = '-100%'", 5000)
       }
       
     }
@@ -105,6 +111,12 @@ export default {
   opacity: 0;
   visibility: hidden;
 
+  .overflow {
+    width: 100%;
+    min-height: 100vh;
+    position: absolute;
+  }
+
   .close {
     position: absolute;
     top: 24px;
@@ -114,6 +126,7 @@ export default {
     padding: 10px;
     border-radius: 8px;
     transition: .1s ease;
+    z-index: 9999;
 
     &:hover {
       background: #1B1B1B;
@@ -132,6 +145,12 @@ export default {
   form {
     display: flex;
     flex-direction: column;
+    z-index: 99999;
+
+    .text-danger {
+      color: rgb(235, 33, 33);
+      margin-bottom: 1rem;
+    }
 
     input {
       width: 400px;
@@ -173,6 +192,23 @@ export default {
       &:hover {
         background-color: darken( #fff, 15%)
       }
+    }
+  }
+
+  .success-card {
+    position: absolute;
+    bottom: 60px;
+    left: -100%;
+    padding: 20px;
+    background: #fff;
+    border-radius: 16px;
+    color: #666;
+    z-index: 9999999;
+    transition: .2s ease;
+
+    span {
+      color: rgb(69, 170, 69);
+      font-weight: 700;
     }
   }
 }

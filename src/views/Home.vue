@@ -1,6 +1,6 @@
 <template>
   <div class="home">
-    <FormBlock :class="{formOpen : !isOpen}" @click="isOpen = !isOpen" />
+    <FormBlock :class="{formOpen : !isOpen}" @click="isOpen = !isOpen"/>
     <main class="main">
       <Header @click="isOpen = !isOpen" />
       <Section />
