@@ -20,7 +20,7 @@
       >
       <span class="text-danger" v-if="(!$v.user_email.required || !$v.user_email.email) && $v.user_email.$dirty">Valid Email is required!</span>
       <textarea 
-        placeholder="messages" 
+        placeholder="Message" 
         name="message"
         v-model="message"
       ></textarea>
@@ -83,7 +83,7 @@ export default {
         this.sendTo(e)
         this.$v.$reset()
         this.resetData()
-        document.querySelector('.success-card').style.left = "20px";
+        document.querySelector('.success-card').classList.add("success-text");
         setTimeout("document.querySelector('.success-card').style.left = '-100%'", 5000)
       }
       
@@ -198,7 +198,7 @@ export default {
   .success-card {
     position: absolute;
     bottom: 60px;
-    left: -100%;
+    left: -200%;
     padding: 20px;
     background: #fff;
     border-radius: 16px;
@@ -211,10 +211,29 @@ export default {
       font-weight: 700;
     }
   }
+
+  .success-text {
+    left: 20px;
+  }
 }
+
+
 
 .invalid {
   border-bottom: 2px solid red !important;
+}
+
+@media screen and (max-width: 600px) {
+  .form-block {
+    .success-card {
+      width: 100%;
+    }
+
+    .success-text {
+      left: 0px;
+    }
+  }
+  
 }
 
 @media screen and (max-width: 460px) {

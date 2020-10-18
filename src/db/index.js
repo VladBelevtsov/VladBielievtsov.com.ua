@@ -13,6 +13,7 @@ const firebaseConfig = {
   appId: '',
   measurementId: ''
 }
+
 // Initialize Firebase
 const firebaseapp = firebase.initializeApp(firebaseConfig)
 firebase.analytics()
